@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('event_vehicle', function (Blueprint $table) {
             $table->id();
+
+            $table->unsignedBigInteger('event_id')->refences('id')->on('events');
+
+            $table->unsignedBigInteger('vehicle_id')->references('id')->on('vehicles');
+
+
+            $table->date('registration_date');
+
             $table->timestamps();
         });
     }

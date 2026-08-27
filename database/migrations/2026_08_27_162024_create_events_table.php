@@ -12,7 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('events', function (Blueprint $table) {
-            $table->id();
+             $table->id();
+
+            $table->unsignedBigInteger('organizer_id')->references('id')->on('users') ;
+            $table->string('event_name');
+            $table->date('event_date');
+            $table->string('location');
             $table->timestamps();
         });
     }

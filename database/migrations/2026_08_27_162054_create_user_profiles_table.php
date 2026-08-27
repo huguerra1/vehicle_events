@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('service_profiles', function (Blueprint $table) {
+        Schema::create('user_profiles', function (Blueprint $table) {
             $table->id();
+
+            $table->unsignedBigInteger('user_id')->references('id')->on('users');
+            $table->text('bio')->nullable();
+            $table->string('instagram_handle')->nullable();
+            $table->string('phone')->nullable();
             $table->timestamps();
         });
     }
@@ -22,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('service_profiles');
+        Schema::dropIfExists('user_profiles');
     }
 };

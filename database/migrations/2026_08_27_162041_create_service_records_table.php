@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('service_records', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('vehicle_id')->references('id')->on('vehicles');
+            $table->int('service_type');       // controlado via PHP Enum no Model
+            $table->text('description')->nullable();
+            $table->date('service_date');
+            $table->decimal('cost', 10, 2);
+
             $table->timestamps();
         });
     }
