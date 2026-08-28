@@ -6,10 +6,10 @@ namespace App\Models;
 use App\Models\Vehicle;
 use App\Models\Event;
 use App\Models\UserProfile;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\Contracts\OAuthenticatable;
 use Laravel\Passport\HasApiTokens;
-
 
 /**
  * Model de usuarios
@@ -17,7 +17,7 @@ use Laravel\Passport\HasApiTokens;
  * @author Hugo Fonseca Mourao <hugo.mourao@sysout.com.br>
  * @date 2026-08-27
  */
-class User extends Model
+class User extends Authenticatable implements OAuthenticatable
 {
      use HasApiTokens, Notifiable;
 

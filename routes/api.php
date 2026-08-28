@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Http\Request;
@@ -8,6 +9,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:api');
+
+//Rotas de autenticação
+
+Route::post('/register', [AuthController::class, 'register']);
+
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware(['auth:api'])->group(function () {
 

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('vehicle_id')->references('id')->on('vehicles');
-            $table->int('service_type');       // controlado via PHP Enum no Model
+            $table->integer('service_type');       // controlado via PHP Enum no Model
             $table->text('description')->nullable();
             $table->date('service_date');
             $table->decimal('cost', 10, 2);
