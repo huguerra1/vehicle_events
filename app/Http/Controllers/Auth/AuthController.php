@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -25,7 +26,7 @@ class AuthController extends Controller
         return response()->json([
             'user'  => $user,
             'token' => $token,
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
     public function login(LoginRequest $request)
@@ -37,7 +38,7 @@ class AuthController extends Controller
         if (! $user || ! Hash::check($data['password'], $user->password_hash)) {
             return response()->json([
                 'message' => 'Credenciais inválidas.',
-            ], 401);
+            ], Response::HTTP_UNAUTHORIZED);
         }
 
         $token = $user->createToken('api-token')->accessToken;
@@ -45,6 +46,6 @@ class AuthController extends Controller
         return response()->json([
             'user'  => $user,
             'token' => $token,
-        ]);
+        ], Response::HTTP_OK);
     }
 }

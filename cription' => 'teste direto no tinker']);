@@ -1,0 +1,10 @@
+[90m= [39m[34;4mApp\Models\ServiceRecord[39;24m {#8201
+    [34mid[39m: [35m1[39m,
+    [34mvehicle_id[39m: [35m2[39m,
+    [34mservice_type[39m: [35m2[39m,
+    [34mdescription[39m: [32m"[39m[32mTroca de filtropooo[39m[32m"[39m,
+    [34mservice_date[39m: [32m"[39m[32m2026-08-20[39m[32m"[39m,
+    [34mcost[39m: [32m"[39m[32m156.00[39m[32m"[39m,
+    [34mcreated_at[39m: [32m"[39m[32m2026-08-28 20:38:06[39m[32m"[39m,
+    [34mupdated_at[39m: [32m"[39m[32m2026-08-31 19:43:32[39m[32m"[39m,
+  }

@@ -1,7 +1,11 @@
 <?php
 
+use App\Enums\ServiceType;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\ServiceRecordController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -16,13 +20,17 @@ Route::post('/register', [AuthController::class, 'register']);
 
 Route::post('/login', [AuthController::class, 'login']);
 
+//Rota pública de tipos de serviço
+
+Route::get('/service-types', function () {
+    return response()->json(ServiceType::options());
+});
+
 Route::middleware(['auth:api'])->group(function () {
 
     //Rotas de usuarios
 
     Route::get('/users', [UserController::class,'index']);
-
-    Route::post('/users',[UserController::class,'create']);
 
     Route::get('/users/{id}',[UserController::class,'show']);
 
@@ -30,20 +38,54 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::put('/users/{id}',[UserController::class,'update']);
 
+    //Rotas de perfil
+
+    Route::get('/profile', [UserProfileController::class, 'show']);
+
+    Route::post('/profile', [UserProfileController::class, 'create']);
+
+    Route::put('/profile', [UserProfileController::class, 'update']);
+
     //Rotas de veiculos
 
 
-    Route::get('/veiculos', [VehicleController::class,'index']);
+    Route::get('/vehicles', [VehicleController::class,'index']);
 
-    Route::post('/veiculos',[VehicleController::class,'create']);
+    Route::post('/vehicles',[VehicleController::class,'create']);
 
-    Route::get('/veiculos/{id}',[VehicleController::class,'show']);
+    Route::get('/vehicles/{id}',[VehicleController::class,'show']);
 
-    Route::delete('/veiculos/{id}',[VehicleController::class,'delete']);    
+    Route::delete('/vehicles/{id}',[VehicleController::class,'delete']);
 
-    Route::put('/veiculos/{id}',[VehicleController::class,'update']);
+    Route::put('/vehicles/{id}',[VehicleController::class,'update']);
 
 
+    //Rotas de serviços
 
+    Route::get('/vehicles/{vehicleId}/service-records', [ServiceRecordController::class, 'index']);
+
+    Route::post('/vehicles/{vehicleId}/service-records', [ServiceRecordController::class, 'create']);
+
+    Route::get('/service-records/{id}', [ServiceRecordController::class, 'show']);
+
+    Route::put('/service-records/{id}', [ServiceRecordController::class, 'update']);
+
+    Route::delete('/service-records/{id}', [ServiceRecordController::class, 'delete']);
+
+    //Rotas de eventos
+
+    Route::get('/events', [EventController::class, 'index']);
+
+    Route::post('/events', [EventController::class, 'create']);
+
+    Route::get('/events/{id}', [EventController::class, 'show']);
+
+    Route::put('/events/{id}', [EventController::class, 'update']);
+
+    Route::delete('/events/{id}', [EventController::class, 'delete']);
+
+    Route::post('/events/{eventId}/vehicles/{vehicleId}', [EventController::class, 'attachVehicle']);
+
+    Route::delete('/events/{eventId}/vehicles/{vehicleId}', [EventController::class, 'detachVehicle']);
 
 });

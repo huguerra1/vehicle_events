@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Enums\ServiceType;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 
 class ServiceRecord extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'vehicle_id',
         'service_type',

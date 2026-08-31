@@ -21,7 +21,6 @@ return new class extends Migration
 
             $table->date('registration_date');
 
-            $table->timestamps();
         });
     }
 
