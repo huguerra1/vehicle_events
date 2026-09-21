@@ -12,7 +12,7 @@ class VehiclesSeeder extends Seeder
     {
         User::all()->each(function (User $user) {
             Vehicle::factory()
-                ->count(rand(1, 3))
+                ->count(25)
                 ->create(['user_id' => $user->id]);
         });
     }

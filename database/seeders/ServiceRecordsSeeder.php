@@ -12,7 +12,7 @@ class ServiceRecordsSeeder extends Seeder
     {
         Vehicle::all()->each(function (Vehicle $vehicle) {
             ServiceRecord::factory()
-                ->count(rand(1, 4))
+                ->count(rand(3, 10))
                 ->create(['vehicle_id' => $vehicle->id]);
         });
     }

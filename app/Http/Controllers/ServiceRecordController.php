@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PaginationRequest;
 use App\Http\Requests\StoreServiceRecordRequest;
 use App\Http\Requests\UpdateServiceRecordRequest;
 use App\Models\ServiceRecord;
 use App\Models\Vehicle;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class ServiceRecordController extends Controller
 {
-    public function index(Request $request, int $vehicleId)
+    public function index(PaginationRequest $request, int $vehicleId): JsonResponse
     {
         $vehicle = Vehicle::find($vehicleId);
 
@@ -19,7 +21,11 @@ class ServiceRecordController extends Controller
             return response()->json(['message' => 'Não encontrado.'], Response::HTTP_NOT_FOUND);
         }
 
-        $serviceRecords = ServiceRecord::where('vehicle_id', $vehicleId)->get();
+        $serviceRecords = $vehicle->serviceRecords()
+            ->latest('service_date')
+            ->latest('id')
+            ->paginate($request->perPage())
+            ->withQueryString();
 
         return response()->json($serviceRecords);
     }

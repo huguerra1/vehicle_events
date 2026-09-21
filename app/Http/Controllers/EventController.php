@@ -2,25 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PaginationRequest;
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Requests\UpdateEventRequest;
 use App\Models\Event;
 use App\Models\Vehicle;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class EventController extends Controller
 {
-    public function index(Request $request)
+    public function index(PaginationRequest $request): JsonResponse
     {
-        $events = Event::search($request)->get();
+        $events = Event::search($request)
+            ->latest('event_date')
+            ->latest('id')
+            ->paginate($request->perPage())
+            ->withQueryString();
 
         return response()->json($events);
     }
 
-    public function show(Request $request, int $id)
+    public function show(Request $request, int $id): JsonResponse
     {
-        $event = Event::find($id);
+        $event = Event::query()
+            ->with([
+                'vehicles' => fn ($query) => $query
+                    ->where('vehicles.user_id', $request->user()->id),
+            ])
+            ->find($id);
 
         if (! $event) {
             return response()->json(['message' => 'Não encontrado.'], Response::HTTP_NOT_FOUND);

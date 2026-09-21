@@ -17,9 +17,9 @@ class UpdateVehicleRequest extends FormRequest
         return [
             'brand' => 'sometimes|string|max:255',
             'model' => 'sometimes|string|max:255',
-            'year'  => 'sometimes|integer|digits:4',
+            'year' => 'sometimes|integer|digits:4',
             'plate' => [
-                'sometimes', 'string', 'max:8',
+                'sometimes', 'string', 'max:7',
                 Rule::unique('vehicles', 'plate')->ignore($this->route('id')),
             ],
         ];

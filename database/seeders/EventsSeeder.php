@@ -13,7 +13,7 @@ class EventsSeeder extends Seeder
         $userIds = User::pluck('id');
 
         collect(range(1, 5))->each(function () use ($userIds) {
-            Event::factory()->create([
+            Event::factory()->count(rand(1, 3))->create([
                 'organizer_id' => $userIds->random(),
             ]);
         });
