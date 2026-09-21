@@ -2,17 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PaginationRequest;
 use App\Http\Requests\StoreVehicleRequest;
 use App\Http\Requests\UpdateVehicleRequest;
 use App\Models\Vehicle;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class VehicleController extends Controller
 {
-    public function index(Request $request)
+    public function index(PaginationRequest $request): JsonResponse
     {
-        $vehicles = $request->user()->vehicles()->search($request)->get();
+        $vehicles = $request->user()
+            ->vehicles()
+            ->search($request)
+            ->latest('id')
+            ->paginate($request->perPage())
+            ->withQueryString();
 
         return response()->json($vehicles);
     }
