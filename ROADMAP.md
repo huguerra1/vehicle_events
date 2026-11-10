@@ -22,3 +22,4 @@
 - 2026-11-09 — Fase 1: arquivo inválido removido, licença MIT, regras de autonomia, roadmap.
 - 2026-11-10 — Testes de feature de autorização para ServiceRecord, UserProfile, User e Auth.
 - 2026-11-10 — Configuração Docker (`Dockerfile`, `docker-compose.yml`, `docker/entrypoint.sh`, `.dockerignore`) e README de portfólio completo.
+- 2026-11-10 — Índice único em `user_profiles.user_id` (garante o 1:1 também com requisições simultâneas).

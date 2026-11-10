@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\UserProfile;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
@@ -44,6 +45,17 @@ class UserProfileControllerTest extends TestCase
             ->assertConflict();
 
         $this->assertDatabaseCount('user_profiles', 1);
+    }
+
+    public function test_database_rejects_a_second_profile_for_the_same_user(): void
+    {
+        $user = User::factory()->create();
+        UserProfile::factory()->for($user)->create();
+
+        // Mesmo sem passar pelo controller (ex.: duas requisições simultâneas), o índice único barra.
+        $this->expectException(UniqueConstraintViolationException::class);
+
+        UserProfile::factory()->for($user)->create();
     }
 
     public function test_shows_only_the_authenticated_users_profile(): void
