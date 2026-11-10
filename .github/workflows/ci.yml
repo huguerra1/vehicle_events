@@ -52,6 +52,9 @@ jobs:
           grep -q '"token"' /tmp/registro.json
           curl -fsS -X POST http://localhost:8000/api/login -H 'Accept: application/json' -H 'Content-Type: application/json' \
             -d '{"email":"ci@example.com","password":"senha-do-ci-123"}' | grep -q '"token"'
+      # Roda a coleção do Postman inteira, de cima a baixo: toda rota precisa responder sem erro.
+      - name: Coleção do Postman (newman)
+        run: npx --yes newman@6 run docs/vehicle_events.postman_collection.json --env-var baseUrl=http://localhost:8000/api
       - if: failure()
         run: |
           docker compose logs

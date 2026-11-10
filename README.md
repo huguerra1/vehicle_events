@@ -141,6 +141,8 @@ curl -i -X GET http://localhost:8000/api/user \
 
 ## Rotas da API (`routes/api.php`)
 
+Para testar rapidamente todas as rotas no **Postman** ou **Insomnia**, importe o arquivo [`docs/vehicle_events.postman_collection.json`](docs/vehicle_events.postman_collection.json) (*Import* → selecione o JSON). A ordem sugerida é executar primeiro **Autenticação → Registrar usuário** (ou **Login**): o script de pós-resposta salva automaticamente o `token` na variável da coleção, autenticando todas as demais requisições; da mesma forma, os endpoints de criação salvam automaticamente `vehicleId`, `serviceRecordId` e `eventId`.
+
 Todas as rotas estão sob o prefixo `/api`.
 
 | Método | Caminho | Autenticação | Descrição |
