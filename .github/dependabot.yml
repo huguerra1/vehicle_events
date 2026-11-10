@@ -6,12 +6,26 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    groups:
+      # Atualizações pequenas chegam num PR só, para não lotar a fila.
+      menores:
+        update-types: [minor, patch]
+    ignore:
+      # O PHPUnit 13 exige PHP 8.4; o projeto usa 8.3 (composer.json, Dockerfile e CI).
+      # Remover esta regra quando o projeto subir para o PHP 8.4.
+      - dependency-name: phpunit/phpunit
+        update-types: [version-update:semver-major]
+
   - package-ecosystem: npm
     directory: /
     target-branch: dev
     schedule:
       interval: weekly
     open-pull-requests-limit: 3
+    groups:
+      menores:
+        update-types: [minor, patch]
+
   - package-ecosystem: github-actions
     directory: /
     target-branch: dev
