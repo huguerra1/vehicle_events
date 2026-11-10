@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_sqlite, sqlite3, bcmath, intl
+          coverage: none
+      - name: Cache do Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ hashFiles('composer.lock') }}
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      # Os testes usam SQLite em memória (phpunit.xml); só precisam de APP_KEY e das chaves do Passport.
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - run: php artisan passport:keys --force
+      - run: php artisan test
+
+  # Sobe o ambiente do docker compose e faz um teste real: cadastro e login.
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose up -d --build
+      - name: Espera a API responder
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:8000/api/service-types > /dev/null; then exit 0; fi
+            sleep 3
+          done
+          docker compose logs app
+          exit 1
+      - name: Cadastro e login
+        run: |
+          set -e
+          curl -fsS -X POST http://localhost:8000/api/register -H 'Accept: application/json' -H 'Content-Type: application/json' \
+            -d '{"name":"CI","email":"ci@example.com","password":"senha-do-ci-123"}' | tee /tmp/registro.json
+          grep -q '"token"' /tmp/registro.json
+          curl -fsS -X POST http://localhost:8000/api/login -H 'Accept: application/json' -H 'Content-Type: application/json' \
+            -d '{"email":"ci@example.com","password":"senha-do-ci-123"}' | grep -q '"token"'
+      # Roda a coleção do Postman inteira, de cima a baixo: toda rota precisa responder sem erro.
+      - name: Coleção do Postman (newman)
+        run: npx --yes newman@6 run docs/vehicle_events.postman_collection.json --env-var baseUrl=http://localhost:8000/api
+      - if: failure()
+        run: |
+          docker compose logs
+          docker compose exec -T app tail -n 80 storage/logs/laravel.log || true
