@@ -6,6 +6,19 @@ if [ ! -f .env ]; then
     cp .env.example .env
 fi
 
+# O `php artisan serve` não repassa as variáveis do container para o servidor web, que lê o .env.
+# Por isso as variáveis definidas no docker-compose.yml são gravadas no .env (substituindo a linha,
+# mesmo comentada, ou acrescentando no fim).
+for chave in APP_ENV APP_DEBUG APP_URL DB_CONNECTION DB_HOST DB_PORT DB_DATABASE DB_USERNAME DB_PASSWORD; do
+    valor=$(printenv "$chave" || true)
+    [ -z "$valor" ] && continue
+    if grep -Eq "^#? ?${chave}=" .env; then
+        sed -i -E "s|^#? ?${chave}=.*|${chave}=${valor}|" .env
+    else
+        printf '%s=%s\n' "$chave" "$valor" >> .env
+    fi
+done
+
 if [ -z "${APP_KEY:-}" ] && ! grep -Eq "^APP_KEY=[^[:space:]]+" .env; then
     echo "Gerando APP_KEY..."
     php artisan key:generate --force --no-interaction
