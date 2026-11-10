@@ -57,7 +57,7 @@ HAS_PERSONAL_CLIENT=$(php -r '
 
 if [ "$HAS_PERSONAL_CLIENT" = "0" ]; then
     echo "Criando personal access client do Passport..."
-    php artisan passport:client --personal --no-interaction
+    php artisan passport:client --personal --name="Vehicle Events" --provider=users --no-interaction
 fi
 
 USER_COUNT=$(php -r '

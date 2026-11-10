@@ -53,4 +53,6 @@ jobs:
           curl -fsS -X POST http://localhost:8000/api/login -H 'Accept: application/json' -H 'Content-Type: application/json' \
             -d '{"email":"ci@example.com","password":"senha-do-ci-123"}' | grep -q '"token"'
       - if: failure()
-        run: docker compose logs
+        run: |
+          docker compose logs
+          docker compose exec -T app tail -n 80 storage/logs/laravel.log || true
