@@ -1,0 +1,1091 @@
+{
+  "info": {
+    "_postman_id": "a6f8c2d0-4b9e-4e1a-9d3c-8f2a1b5c7e90",
+    "name": "Vehicle Events API",
+    "description": "Coleção completa de endpoints da API REST Vehicle Events (Laravel 13 + Passport), cobrindo autenticação OAuth2 (Personal Access Tokens), usuários, perfil, veículos, manutenções e eventos automotivos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "vehicleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "serviceRecordId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "eventId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Autenticação",
+      "description": "Rotas públicas de registro e login com emissão de token Bearer (Laravel Passport) e consulta do usuário autenticado.",
+      "item": [
+        {
+          "name": "Registrar usuário",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    if (json && json.token) {",
+                  "        pm.collectionVariables.set('token', json.token);",
+                  "    }",
+                  "}",
+                  "if (pm.response.json().user) { pm.collectionVariables.set('userId', pm.response.json().user.id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"João Silva\",\n  \"email\": \"joao@example.com\",\n  \"password\": \"senha1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "register"
+              ]
+            },
+            "description": "Registra um novo usuário com nome, e-mail único e senha (mínimo de 8 caracteres) e salva automaticamente o token Bearer na variável `token`."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    if (json && json.token) {",
+                  "        pm.collectionVariables.set('token', json.token);",
+                  "    }",
+                  "}",
+                  "if (pm.response.json().user) { pm.collectionVariables.set('userId', pm.response.json().user.id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"joao@example.com\",\n  \"password\": \"senha1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "Autentica um usuário existente com e-mail e senha e salva automaticamente o token Bearer retornado na variável `token`."
+          },
+          "response": []
+        },
+        {
+          "name": "Obter usuário autenticado",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user"
+              ]
+            },
+            "description": "Retorna os dados do usuário atualmente autenticado pelo token Bearer."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Perfil",
+      "description": "Consulta, criação e atualização do perfil (1:1) do usuário autenticado.",
+      "item": [
+        {
+          "name": "Criar perfil",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Entusiasta de carros clássicos e eventos automotivos.\",\n  \"instagram_handle\": \"@joaosilva.cars\",\n  \"phone\": \"(11) 98765-4321\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profile"
+              ]
+            },
+            "description": "Cria o perfil do usuário autenticado (retorna 201 Created, ou 409 Conflict caso o perfil já exista)."
+          },
+          "response": []
+        },
+        {
+          "name": "Exibir perfil do usuário autenticado",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profile"
+              ]
+            },
+            "description": "Exibe o perfil (bio, instagram_handle e phone) do usuário autenticado (retorna 404 se ainda não possuir perfil)."
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar perfil",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bio\": \"Colecionador e participante de track days.\",\n  \"instagram_handle\": \"@joao.garage\",\n  \"phone\": \"(11) 91234-5678\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profile"
+              ]
+            },
+            "description": "Atualiza os campos do perfil do usuário autenticado (retorna 404 caso o perfil ainda não tenha sido criado)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Veículos",
+      "description": "Gerenciamento de veículos pertencentes ao usuário autenticado.",
+      "item": [
+        {
+          "name": "Listar veículos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles?page=1&per_page=15",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicles"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Número da página (mínimo 1)"
+                },
+                {
+                  "key": "per_page",
+                  "value": "15",
+                  "description": "Itens por página (1 a 100)"
+                },
+                {
+                  "key": "search",
+                  "value": "Corolla",
+                  "description": "Filtro opcional por marca, modelo ou placa",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Lista paginada dos veículos pertencentes ao usuário autenticado, com suporte a busca textual opcional."
+          },
+          "response": []
+        },
+        {
+          "name": "Cadastrar veículo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    if (json && json.id) {",
+                  "        pm.collectionVariables.set('vehicleId', json.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand\": \"Toyota\",\n  \"model\": \"Corolla\",\n  \"year\": 2022,\n  \"plate\": \"ABC1D23\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vehicles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicles"
+              ]
+            },
+            "description": "Cadastra um novo veículo para o usuário autenticado (ano com 4 dígitos e placa única de até 7 caracteres) e salva o ID criado em `vehicleId`."
+          },
+          "response": []
+        },
+        {
+          "name": "Exibir veículo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/{{vehicleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicles",
+                "{{vehicleId}}"
+              ]
+            },
+            "description": "Retorna os detalhes de um veículo específico se pertencer ao usuário autenticado (404 caso contrário)."
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar veículo",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand\": \"Toyota\",\n  \"model\": \"Corolla Altis\",\n  \"year\": 2023,\n  \"plate\": \"ABC1D23\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/{{vehicleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicles",
+                "{{vehicleId}}"
+              ]
+            },
+            "description": "Atualiza os dados de um veículo pertencente ao usuário autenticado."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Manutenções",
+      "description": "Catálogo público de tipos de serviço e gerenciamento do histórico de manutenções dos veículos do usuário autenticado.",
+      "item": [
+        {
+          "name": "Listar tipos de serviço",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/service-types",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "service-types"
+              ]
+            },
+            "description": "Rota pública que retorna a lista fixa de tipos de serviço do enum `ServiceType` (1 = Revisão, 2 = Troca de óleo, 3 = Troca de pneu, 4 = Freio, 5 = Suspensão, 6 = Elétrica, 7 = Outro)."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar manutenções do veículo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/{{vehicleId}}/service-records?page=1&per_page=15",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicles",
+                "{{vehicleId}}",
+                "service-records"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Número da página (mínimo 1)"
+                },
+                {
+                  "key": "per_page",
+                  "value": "15",
+                  "description": "Itens por página (1 a 100)"
+                }
+              ]
+            },
+            "description": "Lista paginada das manutenções registradas para um veículo do usuário autenticado."
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar manutenção no veículo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    if (json && json.id) {",
+                  "        pm.collectionVariables.set('serviceRecordId', json.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"service_type\": 2,\n  \"description\": \"Troca de óleo sintético 5W30 e filtro de óleo.\",\n  \"service_date\": \"2026-05-15\",\n  \"cost\": 350.00\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/{{vehicleId}}/service-records",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicles",
+                "{{vehicleId}}",
+                "service-records"
+              ]
+            },
+            "description": "Registra uma nova manutenção em um veículo do usuário autenticado (`service_type` de 1 a 7 conforme `/service-types`, data em formato `YYYY-MM-DD` e custo numérico >= 0) e salva o ID em `serviceRecordId`."
+          },
+          "response": []
+        },
+        {
+          "name": "Exibir manutenção",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/service-records/{{serviceRecordId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "service-records",
+                "{{serviceRecordId}}"
+              ]
+            },
+            "description": "Exibe os detalhes de um registro de manutenção específico se o veículo pertencer ao usuário autenticado."
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar manutenção",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"service_type\": 1,\n  \"description\": \"Revisão completa de 30.000 km com troca de filtros.\",\n  \"service_date\": \"2026-06-10\",\n  \"cost\": 890.50\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/service-records/{{serviceRecordId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "service-records",
+                "{{serviceRecordId}}"
+              ]
+            },
+            "description": "Atualiza os dados de um registro de manutenção de um veículo do usuário autenticado."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Eventos",
+      "description": "Gerenciamento de eventos automotivos e inscrição/remoção de veículos em eventos.",
+      "item": [
+        {
+          "name": "Listar eventos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/events?page=1&per_page=15",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Número da página (mínimo 1)"
+                },
+                {
+                  "key": "per_page",
+                  "value": "15",
+                  "description": "Itens por página (1 a 100)"
+                },
+                {
+                  "key": "search",
+                  "value": "Interlagos",
+                  "description": "Filtro opcional por nome do evento ou localização",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Lista paginada de eventos automotivos cadastrados, com filtro opcional por nome ou local."
+          },
+          "response": []
+        },
+        {
+          "name": "Criar evento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    if (json && json.id) {",
+                  "        pm.collectionVariables.set('eventId', json.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event_name\": \"Encontro Nacional de Clássicos\",\n  \"event_date\": \"2026-11-20\",\n  \"location\": \"Autódromo de Interlagos - São Paulo, SP\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events"
+              ]
+            },
+            "description": "Cria um novo evento automotivo tendo o usuário autenticado como organizador e salva o ID criado na variável `eventId`."
+          },
+          "response": []
+        },
+        {
+          "name": "Exibir evento",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/events/{{eventId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                "{{eventId}}"
+              ]
+            },
+            "description": "Exibe os dados de um evento específico, trazendo na relação `vehicles` apenas os veículos inscritos pertencentes ao usuário autenticado."
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar evento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event_name\": \"Encontro Nacional de Clássicos - Edição Especial\",\n  \"event_date\": \"2026-11-22\",\n  \"location\": \"Autódromo de Interlagos - Portão 7, São Paulo, SP\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/events/{{eventId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                "{{eventId}}"
+              ]
+            },
+            "description": "Atualiza os dados de um evento caso o usuário autenticado seja o seu organizador (retorna 404 caso contrário)."
+          },
+          "response": []
+        },
+        {
+          "name": "Inscrever veículo no evento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/events/{{eventId}}/vehicles/{{vehicleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                "{{eventId}}",
+                "vehicles",
+                "{{vehicleId}}"
+              ]
+            },
+            "description": "Inscreve um veículo pertencente ao usuário autenticado em um evento (retorna 201 Created, ou 409 Conflict se já estiver inscrito)."
+          },
+          "response": []
+        },
+        {
+          "name": "Remover veículo do evento",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/events/{{eventId}}/vehicles/{{vehicleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                "{{eventId}}",
+                "vehicles",
+                "{{vehicleId}}"
+              ]
+            },
+            "description": "Remove a inscrição de um veículo em um evento (permitido ao dono do veículo ou ao organizador do evento; retorna 204 No Content)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Usuários",
+      "description": "Listagem, visualização, atualização e exclusão de contas de usuário.",
+      "item": [
+        {
+          "name": "Listar usuários",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            },
+            "description": "Lista todos os usuários cadastrados (sem expor hashes de senha ou tokens)."
+          },
+          "response": []
+        },
+        {
+          "name": "Exibir usuário por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Retorna os dados de um usuário específico pelo seu ID (retorna 404 se não existir)."
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar usuário",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"João Silva Atualizado\",\n  \"email\": \"joao@example.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Atualiza o nome e/ou e-mail do próprio usuário autenticado (retorna 404 caso tente alterar outro usuário)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Limpeza (rode por último)",
+      "description": "Exclusões em ordem de dependência: manutenção, evento, veículo e, por fim, o próprio usuário.",
+      "item": [
+        {
+          "name": "Excluir manutenção",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/service-records/{{serviceRecordId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "service-records",
+                "{{serviceRecordId}}"
+              ]
+            },
+            "description": "Exclui um registro de manutenção de um veículo do usuário autenticado (retorna 204 No Content)."
+          },
+          "response": []
+        },
+        {
+          "name": "Excluir evento",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/events/{{eventId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "events",
+                "{{eventId}}"
+              ]
+            },
+            "description": "Exclui um evento caso o usuário autenticado seja o seu organizador (retorna 204 No Content)."
+          },
+          "response": []
+        },
+        {
+          "name": "Excluir veículo",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/{{vehicleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "vehicles",
+                "{{vehicleId}}"
+              ]
+            },
+            "description": "Remove um veículo pertencente ao usuário autenticado (retorna 204 No Content)."
+          },
+          "response": []
+        },
+        {
+          "name": "Excluir usuário",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Remove a conta do próprio usuário autenticado (retorna 204 No Content, ou 404 se o ID pertencer a outro usuário)."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('responde sem erro (status < 400)', function () { pm.expect(pm.response.code).to.be.below(400); });"
+        ]
+      }
+    }
+  ]
+}
